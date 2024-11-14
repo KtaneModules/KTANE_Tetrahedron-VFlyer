@@ -19,7 +19,7 @@ public class TetrahedronModule : MonoBehaviour {
 
 	private static int moduleIdCounter = 1;
 
-	public readonly string TwitchHelpMessage = "\"!{0} ABCD\" - Submit path";
+	public readonly string TwitchHelpMessage = "\"!{0} ABCD\" [Submit a path of selected vertices A,B,C,D, in that order. Refer to the manual of the vertices on the module.]";
 
 	public bool TwitchPlaysActive;
 	public TextMesh Display;
@@ -172,7 +172,8 @@ public class TetrahedronModule : MonoBehaviour {
 		EdgeComponent edge = MoveToEdge(currentNodeId, nodeId);
 		if (!TetrahedronData.IsPassable(edge.color.Value, BombInfo, startingTimeInMinutes)) {
 			Debug.LogFormat("[Tetrahedron #{0}] Trying to use edge \"{1}\" that is {2}. Strike!", moduleId, edge.Id.ToUpper(), TetrahedronData.colorNames[edge.color.Value]);
-			Module.HandleStrike();
+			if (!forceSolved)
+				Module.HandleStrike();
 			currentPath = "";
 			startNode.currentPosition = true;
 		} else if (currentPath.Length == pathLength) {
@@ -204,6 +205,7 @@ public class TetrahedronModule : MonoBehaviour {
 				foreach (EdgeComponent e in baseEdges.Concat(startEdges)) e.color = null;
 				if (registeredSolvesCount >= passedStagesCount) ActivateStage();
 			} else {
+				if (!forceSolved)
 				Module.HandleStrike();
 				if (shouldReset) {
 					stageActive = false;
@@ -280,7 +282,7 @@ public class TetrahedronModule : MonoBehaviour {
 		forceSolved = true;
 		Debug.LogFormat("[Tetrahedron #{0}] Autosolver started", moduleId);
 		yield return new WaitForSeconds(.1f);
-		while (!activated) yield return new WaitForSeconds(.1f);
+		while (!activated) yield return true;
 		while (passedStagesCount != stagesCount) {
 			while (!stageActive) yield return new WaitForSeconds(.1f);
 			char currentNodeId = currentPath.Length == 0 ? 'd' : currentPath.Last();
