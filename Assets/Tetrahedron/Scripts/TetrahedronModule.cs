@@ -284,7 +284,7 @@ public class TetrahedronModule : MonoBehaviour {
 		yield return new WaitForSeconds(.1f);
 		while (!activated) yield return true;
 		while (passedStagesCount != stagesCount) {
-			while (!stageActive) yield return new WaitForSeconds(.1f);
+			while (!stageActive) yield return true;
 			char currentNodeId = currentPath.Length == 0 ? 'd' : currentPath.Last();
 			if (currentNodeId != 'd') {
 				GetNodeById(currentNodeId).currentPosition = false;
